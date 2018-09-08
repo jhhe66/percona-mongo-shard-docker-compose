@@ -94,7 +94,7 @@ To remove all data and re-initialize the cluster, make sure the containers are s
 
 ```
 docker-compose rm
-bash reset-sharding-cluster.sh
+bash reset-sharded-cluster.sh
 ```
 
 Execute the **First Run** instructions again.
