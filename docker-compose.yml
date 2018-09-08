@@ -1,0 +1,196 @@
+version: '3'
+services:
+  ## Config Servers
+  mongocfg01:
+    image: percona/percona-server-mongodb:3.6
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 650536
+        hard: 650536
+    command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16 --logpath=/mnserver/logs/mongodb/mongocfg01.log
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /mnserver/mongodb/mongocfg01:/data/configdb:consistent
+      - /mnserver/logs/mongodb:/mnserver/logs/mongodb/
+      - ./scripts:/scripts
+  mongocfg02:
+    image: percona/percona-server-mongodb:3.6
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 650536
+        hard: 650536
+    command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16 --logpath=/mnserver/logs/mongodb/mongocfg02.log
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /mnserver/mongodb/mongocfg02:/data/configdb:consistent
+      - /mnserver/logs/mongodb:/mnserver/logs/mongodb/
+      - ./scripts:/scripts
+  mongocfg03:
+    image: percona/percona-server-mongodb:3.6
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 650536
+        hard: 650536
+    command: mongod --port 27017 --configsvr --replSet configserver --noprealloc --smallfiles --oplogSize 16 --logpath=/mnserver/logs/mongodb/mongocfg03.log
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /mnserver/mongodb/mongocfg03:/data/configdb:consistent
+      - /mnserver/logs/mongodb:/mnserver/logs/mongodb/
+      - ./scripts:/scripts
+
+  ## Shards
+  mongoshard01a:
+    image: percona/percona-server-mongodb:3.6
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 650536
+        hard: 650536
+    command: mongod --port 27018 --shardsvr --replSet shard01 --noprealloc --smallfiles --oplogSize 16 --logpath=/mnserver/logs/mongodb/mongoshard01a.log
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /mnserver/mongodb/mongoshard01a:/data/db:consistent
+      - /mnserver/logs/mongodb:/mnserver/logs/mongodb/
+      - ./scripts:/scripts
+  mongoshard01b:
+    image: percona/percona-server-mongodb:3.6
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 650536
+        hard: 650536
+    command: mongod --port 27018 --shardsvr --replSet shard01 --noprealloc --smallfiles --oplogSize 16 --logpath=/mnserver/logs/mongodb/mongoshard01b.log
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /mnserver/mongodb/mongoshard01b:/data/db:consistent
+      - /mnserver/logs/mongodb:/mnserver/logs/mongodb/
+      - ./scripts:/scripts
+  mongoshard02a:
+    image: percona/percona-server-mongodb:3.6
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 650536
+        hard: 650536
+    command: mongod --port 27019 --shardsvr --replSet shard02 --noprealloc --smallfiles --oplogSize 16 --logpath=/mnserver/logs/mongodb/mongoshard02a.log
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /mnserver/mongodb/mongoshard02a:/data/db:consistent
+      - /mnserver/logs/mongodb:/mnserver/logs/mongodb/
+      - ./scripts:/scripts
+  mongoshard02b:
+    image: percona/percona-server-mongodb:3.6
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 650536
+        hard: 650536
+    command: mongod --port 27019 --shardsvr --replSet shard02 --noprealloc --smallfiles --oplogSize 16 --logpath=/mnserver/logs/mongodb/mongoshard02b.log
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /mnserver/mongodb/mongoshard02b:/data/db:consistent
+      - /mnserver/logs/mongodb:/mnserver/logs/mongodb/
+      - ./scripts:/scripts
+  mongoshard03a:
+    image: percona/percona-server-mongodb:3.6
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 650536
+        hard: 650536
+    command: mongod --port 27020 --shardsvr --replSet shard03 --noprealloc --smallfiles --oplogSize 16 --logpath=/mnserver/logs/mongodb/mongoshard03a.log
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /mnserver/mongodb/mongoshard03a:/data/db:consistent
+      - /mnserver/logs/mongodb:/mnserver/logs/mongodb/
+      - ./scripts:/scripts
+  mongoshard03b:
+    image: percona/percona-server-mongodb:3.6
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 650536
+        hard: 650536
+    command: mongod --port 27020 --shardsvr --replSet shard03 --noprealloc --smallfiles --oplogSize 16 --logpath=/mnserver/logs/mongodb/mongoshard03b.log
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /mnserver/mongodb/mongoshard03b:/data/db:consistent
+      - /mnserver/logs/mongodb:/mnserver/logs/mongodb/
+      - ./scripts:/scripts
+
+  ## Router
+  mongos01:
+    image: percona/percona-server-mongodb:3.6
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 650536
+        hard: 650536
+    command: mongos --port 27017 --configdb configserver/mongocfg01:27017,mongocfg02:27017,mongocfg03:27017 --logpath=/mnserver/logs/mongodb/mongos01.log
+    ports:
+      - "27017:27017"
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /mnserver/mongodb/mongos01:/data/db:consistent
+      - /mnserver/logs/mongodb:/mnserver/logs/mongodb/
+      - ./scripts:/scripts
+    depends_on:
+      - mongocfg01
+      - mongocfg02
+      - mongocfg03
+      - mongoshard01a
+      - mongoshard01b
+      - mongoshard02a
+      - mongoshard02b
+      - mongoshard03a
+      - mongoshard03b
+  mongos02:
+    image: percona/percona-server-mongodb:3.6
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 650536
+        hard: 650536
+    command: mongos --port 27017 --configdb configserver/mongocfg01:27017,mongocfg02:27017,mongocfg03:27017 --logpath=/mnserver/logs/mongodb/mongos02.log
+    ports:
+      - "27027:27017"
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /mnserver/mongodb/mongos02:/data/db:consistent
+      - /mnserver/logs/mongodb:/mnserver/logs/mongodb/
+      - ./scripts:/scripts
+    depends_on:
+      - mongocfg01
+      - mongocfg02
+      - mongocfg03
+      - mongoshard01a
+      - mongoshard01b
+      - mongoshard02a
+      - mongoshard02b
+      - mongoshard03a
+      - mongoshard03b
